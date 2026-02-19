@@ -1,0 +1,14 @@
+# Render.com 배포 설정
+services:
+  - type: web
+    name: algumon-crawler
+    env: node
+    plan: free
+    buildCommand: npm install
+    startCommand: npm start
+    healthCheckPath: /health
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: PORT
+        value: 3000
