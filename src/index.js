@@ -2,7 +2,8 @@
  * 🛒 알구몬 크롤링 서버
  * - Render.com 무료 호스팅
  * - axios + cheerio 크롤링
- * - 1분마다 자동 실행
+ * - 5분마다 자동 실행
+ * - 카테고리 1~6 순차 처리
  * - Supabase 저장
  */
 
@@ -126,7 +127,7 @@ app.get('/cron', (req, res) => {
   res.json({
     success: true,
     cron: {
-      schedule: '*/1 * * * * (매분)',
+      schedule: '*/5 * * * * (5분마다)',
       isRunning: true,
       platform: 'Render.com',
       totalRuns: crawlStats.totalRuns,
@@ -203,13 +204,13 @@ async function startServer() {
       setTimeout(performCrawling, 5000); // 5초 후 실행
     });
     
-    // 1분마다 크롤링 실행 (Render.com에서 안정적)
-    cron.schedule('*/1 * * * *', () => {
-      console.log('⏰ 1분 스케줄 크롤링 시작...');
+    // 5분마다 크롤링 실행 (안정적이고 부하 분산)
+    cron.schedule('*/5 * * * *', () => {
+      console.log('⏰ 5분 스케줄 크롤링 시작...');
       performCrawling();
     });
     
-    console.log('⏰ 크론 작업 등록 완료: 1분마다 실행');
+    console.log('⏰ 크론 작업 등록 완료: 5분마다 실행');
     
   } catch (error) {
     console.error('❌ 서버 시작 실패:', error);

@@ -1,6 +1,6 @@
 /**
  * 🕷️ 알구몬 크롤러 - axios + cheerio
- * - 카테고리 1-6 모두 크롤링
+ * - 카테고리 1-6 순차 크롤링
  * - 실제 브라우저 헤더 시뮬레이션
  * - 가격 정보 추출
  * - Supabase 저장
@@ -50,53 +50,56 @@ async function crawlAllCategories() {
   };
 
   try {
-    // 병렬로 모든 카테고리 크롤링
-    const categoryPromises = Object.keys(CATEGORIES).map(async (categoryId) => {
+    // 순차적으로 카테고리 크롤링 (1→2→3→4→5→6)
+    for (const categoryId of Object.keys(CATEGORIES)) {
       try {
+        console.log(`🎯 카테고리 ${categoryId} (${CATEGORIES[categoryId]}) 크롤링 중...`);
+        
         const categoryResult = await crawlCategory(categoryId);
-        return { categoryId, ...categoryResult };
+        results.categoryResults[categoryId] = categoryResult;
+
+        if (categoryResult.success) {
+          results.categories++;
+          results.totalItems += categoryResult.items.length;
+
+          console.log(`✅ 카테고리 ${categoryId} 완료: ${categoryResult.items.length}개 아이템`);
+
+          // Supabase에 순차 저장
+          for (const item of categoryResult.items) {
+            try {
+              const saveResult = await saveAlgumonDeal(item);
+              
+              if (saveResult.success) {
+                if (saveResult.inserted) {
+                  results.newItems++;
+                } else if (saveResult.skipped) {
+                  results.skippedItems++;
+                }
+              } else {
+                results.errorItems++;
+                console.error(`❌ 저장 실패: ${item.title} - ${saveResult.error?.message}`);
+              }
+            } catch (error) {
+              results.errorItems++;
+              console.error(`❌ 저장 예외: ${item.title} - ${error.message}`);
+            }
+          }
+        } else {
+          console.error(`❌ 카테고리 ${categoryId} 실패: ${categoryResult.error}`);
+        }
+
+        // 카테고리 간 1초 대기 (서버 부하 방지)
+        if (categoryId < 6) {
+          await new Promise(resolve => setTimeout(resolve, 1000));
+        }
+        
       } catch (error) {
         console.error(`❌ 카테고리 ${categoryId} 크롤링 실패:`, error.message);
-        return { 
-          categoryId, 
+        results.categoryResults[categoryId] = { 
           success: false, 
           items: [], 
           error: error.message 
         };
-      }
-    });
-
-    const categoryResults = await Promise.all(categoryPromises);
-
-    // 결과 통합
-    for (const result of categoryResults) {
-      const { categoryId, ...categoryData } = result;
-      results.categoryResults[categoryId] = categoryData;
-
-      if (result.success) {
-        results.categories++;
-        results.totalItems += result.items.length;
-
-        // Supabase에 저장
-        for (const item of result.items) {
-          try {
-            const saveResult = await saveAlgumonDeal(item);
-            
-            if (saveResult.success) {
-              if (saveResult.inserted) {
-                results.newItems++;
-              } else if (saveResult.skipped) {
-                results.skippedItems++;
-              }
-            } else {
-              results.errorItems++;
-              console.error(`❌ 저장 실패: ${item.title} - ${saveResult.error?.message}`);
-            }
-          } catch (error) {
-            results.errorItems++;
-            console.error(`❌ 저장 예외: ${item.title} - ${error.message}`);
-          }
-        }
       }
     }
 

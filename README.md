@@ -1,14 +1,14 @@
 # 🛒 알구몬 크롤링 서버
 
-알구몬 전용 크롤링 서버 - Render.com + axios/cheerio + Supabase
+알구몬 전용 크롤링 서버 - Render.com + axios/cheerio + Supabase (5분 주기, 순차 처리)
 
 ## 🏗️ 아키텍처
 
 ```
 🛒 알구몬 크롤러 (Render.com)
 ├── 🕷️ axios + cheerio (웹 크롤링)
-├── ⏰ node-cron (1분 자동화)
-├── 🔄 6개 카테고리 병렬 처리
+├── ⏰ node-cron (5분 자동화)
+├── 🔄 6개 카테고리 순차 처리 (1→2→3→4→5→6)
 └── 💾 Supabase 저장
 
 🗄️ Supabase (중앙 DB)
@@ -96,7 +96,7 @@ Render.com 헬스체크
 ### 🕷️ 강력한 크롤링
 - axios + cheerio로 빠른 HTML 파싱
 - 실제 브라우저 헤더 시뮬레이션
-- 6개 카테고리 병렬 처리
+- 6개 카테고리 순차 처리
 - 에러 복구 및 재시도 로직
 
 ### 💰 가격 정보 추출
