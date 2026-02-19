@@ -5,7 +5,7 @@ services:
   - type: web
     name: algumon-crawler
     env: node
-    buildCommand: npm install
+    buildCommand: npm install --only=production
     startCommand: npm start
     plan: free
     envVars:
