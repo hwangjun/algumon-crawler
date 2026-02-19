@@ -23,9 +23,9 @@ async function initSupabase() {
 
     supabase = createClient(supabaseUrl, supabaseKey);
     
-    // 연결 테스트
+    // 연결 테스트 (hotdeal-nextjs와 동일한 deals 테이블 사용)
     const { data, error } = await supabase
-      .from('hotdeals')
+      .from('deals')
       .select('id')
       .limit(1);
     
@@ -53,7 +53,7 @@ async function saveAlgumonDeal(dealData) {
 
     // URL 기반 중복 확인
     const { data: existing, error: checkError } = await supabase
-      .from('hotdeals')
+      .from('deals')
       .select('id, title')
       .eq('url', dealData.url)
       .limit(1);
@@ -104,7 +104,7 @@ async function saveAlgumonDeal(dealData) {
 
     // 새 딜 저장
     const { data: inserted, error: insertError } = await supabase
-      .from('hotdeals')
+      .from('deals')
       .insert([formattedDeal])
       .select()
       .single();
@@ -133,7 +133,7 @@ async function saveAlgumonDeal(dealData) {
 async function getAlgumonDealCount() {
   try {
     const { count, error } = await supabase
-      .from('hotdeals')
+      .from('deals')
       .select('*', { count: 'exact', head: true })
       .eq('mall_name', '알구몬');
 
@@ -156,7 +156,7 @@ async function getAlgumonStats() {
     today.setHours(0, 0, 0, 0);
 
     const { count: todayCount, error: todayError } = await supabase
-      .from('hotdeals')
+      .from('deals')
       .select('*', { count: 'exact', head: true })
       .eq('mall_name', '알구몬')
       .gte('created_at', today.toISOString());
@@ -165,7 +165,7 @@ async function getAlgumonStats() {
 
     // 카테고리별 통계
     const { data: categoryStats, error: categoryError } = await supabase
-      .from('hotdeals')
+      .from('deals')
       .select('algumon_category')
       .eq('mall_name', '알구몬')
       .gte('created_at', today.toISOString());
@@ -205,7 +205,7 @@ async function cleanupOldAlgumonDeals() {
     sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7);
 
     const { data, error } = await supabase
-      .from('hotdeals')
+      .from('deals')
       .delete()
       .eq('mall_name', '알구몬')
       .lt('created_at', sevenDaysAgo.toISOString())
@@ -231,7 +231,7 @@ async function cleanupOldAlgumonDeals() {
 async function getAlgumonDealsByCategory(categoryId) {
   try {
     const { data, error } = await supabase
-      .from('hotdeals')
+      .from('deals')
       .select('*')
       .eq('mall_name', '알구몬')
       .eq('algumon_category', categoryId)

@@ -9,6 +9,77 @@ require('dotenv').config();
 const { testCategory, crawlAllCategories, CATEGORIES } = require('./crawler');
 const { initSupabase } = require('./supabase');
 
+/**
+ * 🏥 시스템 헬스체크
+ */
+async function systemHealthCheck() {
+  console.log('🏥 시스템 헬스체크 시작...');
+  
+  const checks = {
+    nodeVersion: true,
+    dependencies: true,
+    supabaseConnection: false,
+    networkAccess: false
+  };
+  
+  try {
+    // Node.js 버전 확인
+    const nodeVersion = process.version;
+    console.log(`✅ Node.js 버전: ${nodeVersion}`);
+    
+    // 의존성 확인
+    try {
+      require('axios');
+      require('cheerio');
+      require('@supabase/supabase-js');
+      console.log('✅ 필수 의존성 로드 성공');
+    } catch (error) {
+      console.error('❌ 의존성 로드 실패:', error.message);
+      checks.dependencies = false;
+    }
+    
+    // Supabase 연결 테스트
+    if (process.env.SUPABASE_URL && process.env.SUPABASE_ANON_KEY) {
+      try {
+        await initSupabase();
+        console.log('✅ Supabase 연결 성공');
+        checks.supabaseConnection = true;
+      } catch (error) {
+        console.error('❌ Supabase 연결 실패:', error.message);
+      }
+    } else {
+      console.log('⚠️ Supabase 환경변수 없음');
+    }
+    
+    // 네트워크 접근 테스트
+    try {
+      const axios = require('axios');
+      await axios.get('https://www.algumon.com', { timeout: 5000 });
+      console.log('✅ 알구몬 사이트 접근 가능');
+      checks.networkAccess = true;
+    } catch (error) {
+      console.error('❌ 네트워크 접근 실패:', error.message);
+    }
+    
+    const passedChecks = Object.values(checks).filter(Boolean).length;
+    const totalChecks = Object.keys(checks).length;
+    
+    console.log(`\n🎯 헬스체크 결과: ${passedChecks}/${totalChecks} 통과`);
+    
+    if (checks.dependencies && checks.networkAccess) {
+      console.log('✅ 기본 기능 동작 가능');
+      return true;
+    } else {
+      console.log('❌ 필수 기능 실패');
+      return false;
+    }
+    
+  } catch (error) {
+    console.error('❌ 헬스체크 오류:', error);
+    return false;
+  }
+}
+
 async function runTests() {
   console.log('🧪 알구몬 크롤러 테스트 시작...\n');
   
@@ -94,7 +165,18 @@ const args = process.argv.slice(2);
 if (args.length > 0) {
   const command = args[0];
   
-  if (command === 'category' && args[1]) {
+  if (command === 'health') {
+    // 헬스체크
+    systemHealthCheck()
+      .then(result => {
+        process.exit(result ? 0 : 1);
+      })
+      .catch(error => {
+        console.error('헬스체크 실패:', error);
+        process.exit(1);
+      });
+      
+  } else if (command === 'category' && args[1]) {
     // 특정 카테고리 테스트
     const categoryId = args[1];
     console.log(`🎯 카테고리 ${categoryId} 단독 테스트`);
@@ -137,6 +219,7 @@ if (args.length > 0) {
   } else {
     console.log('사용법:');
     console.log('  npm test                    # 전체 테스트');
+    console.log('  npm test health             # 시스템 헬스체크');
     console.log('  npm test category 1         # 카테고리 1 테스트');
     console.log('  npm test full               # 전체 크롤링 (저장 포함)');
     process.exit(1);

@@ -7,7 +7,12 @@
     "start": "node src/index.js",
     "dev": "nodemon src/index.js",
     "test": "node src/test.js",
-    "crawl": "node src/crawler.js"
+    "test:health": "node src/test.js health",
+    "test:category": "node src/test.js category",
+    "test:full": "node src/test.js full",
+    "crawl": "node src/crawler.js",
+    "lint": "echo 'ESLint 미설정 - 건너뛰기'",
+    "validate": "node -c src/index.js && node -c src/crawler.js && node -c src/supabase.js"
   },
   "dependencies": {
     "express": "^4.18.2",
