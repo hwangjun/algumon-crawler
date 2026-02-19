@@ -96,10 +96,9 @@ async function saveAlgumonDeal(dealData) {
       created_at: new Date().toISOString(),
       crawled_at: new Date().toISOString(),
       
-      // 알구몬 전용 필드
-      algumon_category: dealData.algumon_category,
-      site_name: dealData.site_name,
-      deal_score: dealData.deal_score
+      // 알구몬 전용 필드 (기존 테이블 구조 호환)
+      // algumon_category는 description에 포함
+      description: `[카테고리 ${dealData.algumon_category}] ${dealData.description || dealData.site_name || ''}`.trim()
     };
 
     // 새 딜 저장
@@ -163,10 +162,10 @@ async function getAlgumonStats() {
 
     if (todayError) throw todayError;
 
-    // 카테고리별 통계
+    // 카테고리별 통계 (description에서 카테고리 추출)
     const { data: categoryStats, error: categoryError } = await supabase
       .from('deals')
-      .select('algumon_category')
+      .select('description')
       .eq('mall_name', '알구몬')
       .gte('created_at', today.toISOString());
 
@@ -174,8 +173,13 @@ async function getAlgumonStats() {
 
     const categoryCounts = {};
     categoryStats?.forEach(item => {
-      if (item.algumon_category) {
-        categoryCounts[item.algumon_category] = (categoryCounts[item.algumon_category] || 0) + 1;
+      if (item.description) {
+        // "[카테고리 1]" 형태에서 카테고리 번호 추출
+        const match = item.description.match(/\[카테고리 (\d+)\]/);
+        if (match) {
+          const categoryId = match[1];
+          categoryCounts[categoryId] = (categoryCounts[categoryId] || 0) + 1;
+        }
       }
     });
 
@@ -234,7 +238,7 @@ async function getAlgumonDealsByCategory(categoryId) {
       .from('deals')
       .select('*')
       .eq('mall_name', '알구몬')
-      .eq('algumon_category', categoryId)
+      .like('description', `[카테고리 ${categoryId}]%`)
       .order('created_at', { ascending: false })
       .limit(20);
 
