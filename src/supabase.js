@@ -94,6 +94,7 @@ async function saveAlgumonDeal(dealData) {
       source: 'Crawler-알구몬',
       delivery_info: dealData.delivery_info || '원문 확인',
       created_at: new Date().toISOString(),
+      updated_at: new Date().toISOString(),
       crawled_at: new Date().toISOString(),
       
       // 알구몬 전용 필드 (기존 테이블 구조 호환)
