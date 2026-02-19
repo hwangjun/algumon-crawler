@@ -8,43 +8,45 @@ services:
     buildCommand: npm install --only=production
     startCommand: npm start
     plan: free
-    
+
     # UptimeRobot 최적화 설정
     healthCheckPath: /health  # Render 내장 Health Check
-    
+
     envVars:
       - key: NODE_ENV
         value: production
       - key: SUPABASE_URL
         sync: false
-      - key: SUPABASE_ANON_KEY  
-        sync: false
+      - key: SUPABASE_SERVICE_ROLE_KEY
+        sync: false  # 🔑 SERVICE_ROLE_KEY 필수! (쓰기 권한)
+      - key: SUPABASE_ANON_KEY
+        sync: false  # Fallback용
       - key: PORT
         generateValue: true  # Render 자동 할당
-        
+
     # Sleep 모드 최적화
     scaling:
       minInstances: 1
       maxInstances: 1
-    
+
     # 자동 배포 설정
     autoDeploy: true
     branch: main
-    
+
     # 리소스 최적화
     disk:
       name: algumon-crawler-disk
       size: 1GB
-      
+
     # 환경 최적화
     region: oregon  # 빠른 응답을 위한 US West
-    
+
     # 로그 레벨
     logLevel: info
 
 # UptimeRobot 모니터링 엔드포인트 최적화:
 # /ping          - 초경량 핑 (1분 간격)
-# /health        - 상세 상태 (5분 간격)  
+# /health        - 상세 상태 (5분 간격)
 # /status-check  - 서비스 상태 (10분 간격)
 # /              - 메인 서비스 (15분 간격)
 

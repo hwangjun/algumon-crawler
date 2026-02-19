@@ -13,8 +13,10 @@ services:
         value: production
       - key: SUPABASE_URL
         sync: false
+      - key: SUPABASE_SERVICE_ROLE_KEY
+        sync: false  # 🔑 SERVICE_ROLE_KEY 필수! (쓰기 권한)
       - key: SUPABASE_ANON_KEY
-        sync: false
+        sync: false  # Fallback용
       - key: PORT
         value: 3000
     scaling:

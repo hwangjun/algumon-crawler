@@ -24,7 +24,10 @@ let supabase = null;
 async function initSupabase() {
   try {
     const supabaseUrl = process.env.SUPABASE_URL || process.env.NEXT_PUBLIC_SUPABASE_URL;
-    const supabaseKey = process.env.SUPABASE_ANON_KEY || process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
+    // 쓰기 권한을 위해 service_role key 우선 사용, fallback은 anon key
+    const supabaseKey = process.env.SUPABASE_SERVICE_ROLE_KEY || 
+                       process.env.SUPABASE_ANON_KEY || 
+                       process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
 
     if (!supabaseUrl || !supabaseKey) {
       throw new Error('Supabase 환경변수 필요: SUPABASE_URL, SUPABASE_ANON_KEY');
