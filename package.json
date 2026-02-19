@@ -1,18 +1,26 @@
 {
   "name": "algumon-crawler",
-  "version": "1.0.0",
+  "version": "2.0.0",
   "description": "🛒 알구몬 전용 크롤링 서버 - Render + axios/cheerio + Supabase",
   "main": "src/index.js",
   "scripts": {
-    "start": "node src/index.js",
-    "dev": "nodemon src/index.js",
-    "test": "node src/test.js",
+    "start": "node src/index-v2.js",
+    "start:v1": "node src/index.js",
+    "dev": "nodemon src/index-v2.js",
+    "dev:v1": "nodemon src/index.js",
+    "test": "node test-v2.js",
+    "test:v1": "node src/test.js",
+    "test:dealid": "node test-v2.js dealid",
+    "test:crawl": "node test-v2.js crawl",
+    "test:db": "node test-v2.js db init",
+    "test:benchmark": "node test-v2.js benchmark",
     "test:health": "node src/test.js health",
     "test:category": "node src/test.js category",
     "test:full": "node src/test.js full",
     "crawl": "node src/crawler.js",
     "lint": "echo 'ESLint 미설정 - 건너뛰기'",
-    "validate": "node -c src/index.js && node -c src/crawler.js && node -c src/supabase.js"
+    "validate": "node -c src/index-v2.js && node -c src/crawler-v2.js && node -c src/supabase-v2.js",
+    "validate:v1": "node -c src/index.js && node -c src/crawler.js && node -c src/supabase.js"
   },
   "dependencies": {
     "express": "^4.18.2",
