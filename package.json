@@ -2,7 +2,7 @@
   "name": "algumon-crawler",
   "version": "2.0.0",
   "description": "🛒 알구몬 전용 크롤링 서버 - Render + axios/cheerio + Supabase",
-  "main": "src/index.js",
+  "main": "src/index-v2.js",
   "scripts": {
     "start": "node src/index-v2.js",
     "start:v1": "node src/index.js",
