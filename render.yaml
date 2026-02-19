@@ -1,9 +1,9 @@
-# 🛒 Render.com Background Worker 설정
-# 알구몬 크롤링 Background Worker v3
+# 🛒 Render.com Web Service 설정
+# 알구몬 크롤링 Web Service v2.1
 
 services:
-  - type: worker
-    name: algumon-crawler-worker
+  - type: web
+    name: algumon-crawler
     env: node
     buildCommand: npm install
     startCommand: npm start
@@ -15,16 +15,18 @@ services:
         sync: false
       - key: SUPABASE_ANON_KEY
         sync: false
+      - key: PORT
+        value: 3000
     scaling:
       minInstances: 1
       maxInstances: 1
     autoDeploy: true
     branch: main
     
-# Background Worker 특징:
-# - Express 서버 없음 (포트 바인딩 없음)
-# - HTTP 트래픽 처리 안함
-# - 순수하게 크롤링 작업만 수행
-# - 메모리 사용량 낮음
-# - CPU 사용량 낮음
-# - 더 안정적인 장기 실행
+# Web Service 특징:
+# - Express 서버 (포트 3000)
+# - HTTP API 엔드포인트 제공
+# - 크롤링 + API 동시 제공
+# - 수동 크롤링 트리거 가능
+# - 실시간 상태 조회 가능
+# - Health check 엔드포인트
