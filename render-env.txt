@@ -1,0 +1,7 @@
+# 🚀 Render.com 환경변수 설정용
+# 아래 내용을 복사해서 Render.com Environment Variables에 붙여넣기
+
+SUPABASE_URL=https://lywpfaklcxbtjixmnjfg.supabase.co
+SUPABASE_ANON_KEY=sb_publishable_DuMpdr9aJbaCn88ThV_7zg_3V4kFa6v
+NODE_ENV=production
+PORT=3000

@@ -1,37 +1,31 @@
 {
   "name": "algumon-crawler",
-  "version": "2.0.0",
-  "description": "🛒 알구몬 전용 크롤링 서버 - Render + axios/cheerio + Supabase",
-  "main": "src/index-v2.js",
+  "version": "3.0.0",
+  "description": "🛒 알구몬 크롤링 Background Worker - 순수 백그라운드 워커",
+  "main": "src/worker.js",
   "scripts": {
-    "start": "node src/index-v2.js",
-    "start:v1": "node src/index.js",
-    "dev": "nodemon src/index-v2.js",
-    "dev:v1": "nodemon src/index.js",
+    "start": "node src/worker.js",
+    "worker": "node src/worker.js",
+    "server": "node src/index-v2.js",
+    "server:v1": "node src/index.js",
+    "dev": "nodemon src/worker.js",
+    "dev:server": "nodemon src/index-v2.js",
     "test": "node test-v2.js",
-    "test:v1": "node src/test.js",
+    "test:worker": "node -c src/worker.js",
     "test:dealid": "node test-v2.js dealid",
     "test:crawl": "node test-v2.js crawl",
     "test:db": "node test-v2.js db init",
     "test:benchmark": "node test-v2.js benchmark",
-    "test:health": "node src/test.js health",
-    "test:category": "node src/test.js category",
-    "test:full": "node src/test.js full",
     "crawl": "node src/crawler.js",
     "lint": "echo 'ESLint 미설정 - 건너뛰기'",
-    "validate": "node -c src/index-v2.js && node -c src/crawler-v2.js && node -c src/supabase-v2.js",
-    "validate:v1": "node -c src/index.js && node -c src/crawler.js && node -c src/supabase.js"
+    "validate": "node -c src/worker.js && node -c src/crawler-v2.js && node -c src/supabase-v2.js"
   },
   "dependencies": {
-    "express": "^4.18.2",
     "axios": "^1.6.0",
     "cheerio": "^1.0.0-rc.12",
     "node-cron": "^3.0.3",
     "@supabase/supabase-js": "^2.45.4",
-    "cors": "^2.8.5",
-    "dotenv": "^16.3.1",
-    "helmet": "^7.1.0",
-    "morgan": "^1.10.0"
+    "dotenv": "^16.3.1"
   },
   "devDependencies": {
     "nodemon": "^3.0.2"
@@ -40,6 +34,7 @@
     "node": ">=18.0.0"
   },
   "keywords": [
+    "background-worker",
     "crawler",
     "algumon", 
     "hotdeal",
