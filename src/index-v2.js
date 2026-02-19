@@ -316,17 +316,51 @@ async function startServer() {
   }
 }
 
-// Render.com 헬스체크
+// UptimeRobot 최적화 헬스체크
 app.get('/health', (req, res) => {
   const cacheStats = getCacheStats();
+  const memoryUsage = process.memoryUsage();
+  const uptime = process.uptime();
   
-  res.status(200).json({
+  // UptimeRobot Keyword 체크용 응답
+  const healthData = {
     status: 'healthy',
-    version: '2.0.0',
-    uptime: process.uptime(),
-    cache: cacheStats.currentSize,
+    service: 'algumon-crawler',
+    version: '2.1.0',
+    uptime: Math.floor(uptime),
+    memory_mb: Math.round(memoryUsage.heapUsed / 1024 / 1024),
+    cache_size: cacheStats.currentSize,
+    last_crawl: lastCrawlTime,
+    crawl_success_rate: crawlStats.totalRuns > 0 ? 
+      Math.round((crawlStats.successRuns / crawlStats.totalRuns) * 100) : 0,
+    server_ready: isServerReady,
     timestamp: new Date().toISOString()
-  });
+  };
+  
+  // UptimeRobot 응답 최적화
+  res.status(200)
+    .set('Cache-Control', 'no-cache, no-store, must-revalidate')
+    .set('X-Health-Check', 'ok')
+    .json(healthData);
+});
+
+// UptimeRobot 초경량 핑 엔드포인트
+app.get('/ping', (req, res) => {
+  res.status(200)
+    .set('Cache-Control', 'no-cache')
+    .send('pong');
+});
+
+// UptimeRobot 상태 체크 (Keyword: "operational")
+app.get('/status-check', (req, res) => {
+  const isHealthy = isServerReady && crawlStats.totalRuns >= 0;
+  
+  res.status(isHealthy ? 200 : 503)
+    .json({
+      service: 'operational',
+      status: isHealthy ? 'up' : 'down',
+      timestamp: Date.now()
+    });
 });
 
 // 404 처리
