@@ -13,6 +13,7 @@
     "test": "node test-v2.js",
     "test:server": "node -c src/index-v2.js",
     "test:worker": "node -c src/worker.js",
+    "test:price-history": "node test-price-history.js",
     "test:dealid": "node test-v2.js dealid",
     "test:crawl": "node test-v2.js crawl",
     "test:db": "node test-v2.js db init",
